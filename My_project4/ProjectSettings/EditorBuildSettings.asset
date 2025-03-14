@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/panel_accueil.unity
     guid: 8709812ad0fed9544ba3197eacb61669
   - enabled: 1
-    path: Assets/corps_humain.unity
+    path: Assets/Project/corps_humain.unity
     guid: 996078115efc4154893aadb5751beeef
   - enabled: 1
     path: Assets/organes.unity
