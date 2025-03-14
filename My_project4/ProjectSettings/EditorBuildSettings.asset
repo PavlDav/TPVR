@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Project/Scenes/SampleScene.unity
     guid: 55daccc09a3b69647bbab145b54a3ab3
+  - enabled: 1
+    path: Assets/panel_accueil.unity
+    guid: 8709812ad0fed9544ba3197eacb61669
+  - enabled: 1
+    path: Assets/corps_humain.unity
+    guid: 996078115efc4154893aadb5751beeef
+  - enabled: 1
+    path: Assets/organes.unity
+    guid: 19d49c50d8e3f324abbf124985c01d74
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: bfa1182bd221b4ca89619141f66f1260, type: 2}
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: dc5a169419fa04987b057f65238cf3ba, type: 2}
