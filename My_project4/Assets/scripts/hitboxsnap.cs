@@ -1,41 +1,67 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class HitboxSnap : MonoBehaviour
 {
-    public string targetOrganTag; // Tag de l'organe correspondant
-    public Transform snapPosition; // Position exacte où l'organe doit se placer
-    public GameObject snapParticleEffect; // Particle effect to instantiate on snap
+    public string targetOrganTag;
+    public Transform snapPosition;
+    public ParticleSystem snapParticleEffect;
+    public AudioSource snapSoundEffect;
+
+    public Transform[] basePositions; // Slots de base pour chaque organe
+
     private Renderer hitboxRenderer;
-    private GameObject organInZone; // Stocke l’organe dans la hitbox
-    private Coroutine snapCoroutine; // Stocke la coroutine en cours
-    private ScoreManager scoreManager; // Référence au ScoreManager
+    private GameObject organInZone;
+    private Coroutine snapCoroutine;
+    private ScoreManager scoreManager;
+    private Collider hitboxCollider;
+
+    private Dictionary<GameObject, Transform> organBasePositions = new Dictionary<GameObject, Transform>();
 
     private void Start()
     {
         hitboxRenderer = GetComponent<Renderer>();
+        hitboxCollider = GetComponent<Collider>();
         SetAlpha(hitboxRenderer.material.color.a);
-
-        // Trouver le ScoreManager dans la scène
         scoreManager = FindObjectOfType<ScoreManager>();
+
+        if (snapParticleEffect != null)
+        {
+            snapParticleEffect.Stop();
+        }
+
+        AssignBasePositions(); // Associe les organes à leurs positions de base
+    }
+
+    private void AssignBasePositions()
+    {
+        GameObject[] organs = GameObject.FindGameObjectsWithTag(targetOrganTag);
+        
+        if (organs.Length != basePositions.Length)
+        {
+            Debug.LogError("Le nombre de slots de base ne correspond pas au nombre d'organes !");
+            return;
+        }
+
+        for (int i = 0; i < organs.Length; i++)
+        {
+            organBasePositions[organs[i]] = basePositions[i];
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(targetOrganTag))
         {
-            hitboxRenderer.material.color = new Color(0f, 1f, 0f, 0.2f); // Vert avec alpha 0.3
+            hitboxRenderer.material.color = new Color(0f, 1f, 0f, 0.2f);
             organInZone = other.gameObject;
-
-            // Lancer le timer de 2s pour le snap
             snapCoroutine = StartCoroutine(SnapAfterDelay(2f, organInZone));
         }
         else
         {
-            hitboxRenderer.material.color = new Color(1f, 0f, 0f, 0.3f); // Rouge avec alpha 0.3
+            hitboxRenderer.material.color = new Color(1f, 0f, 0f, 0.3f);
             organInZone = other.gameObject;
-
-            // Lancer le timer de 2s pour déduire des points
             snapCoroutine = StartCoroutine(DeductPointsAfterDelay(2f, organInZone));
         }
     }
@@ -44,10 +70,9 @@ public class HitboxSnap : MonoBehaviour
     {
         if (other.CompareTag(targetOrganTag) || organInZone == other.gameObject)
         {
-            hitboxRenderer.material.color = new Color(1f, 0f, 0f, 0.3f); // Rouge avec alpha 0.3
+            hitboxRenderer.material.color = new Color(1f, 0f, 0f, 0.3f);
             organInZone = null;
 
-            // Annuler le snap ou la déduction de points si l’objet sort avant 2 secondes
             if (snapCoroutine != null)
             {
                 StopCoroutine(snapCoroutine);
@@ -60,17 +85,26 @@ public class HitboxSnap : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        // Vérifier si l’objet est toujours dans la hitbox
         if (organInZone == organ)
         {
             SnapOrgan(organ);
-            // Ajouter des points une fois l'organe snap
-            scoreManager.AddPoints(10); // Ajoute 10 points (modifiable selon ta logique)
+            scoreManager.AddPoints(10);
 
-            // Instantiate the particle effect
             if (snapParticleEffect != null)
             {
-                Instantiate(snapParticleEffect, snapPosition.position, snapPosition.rotation);
+                snapParticleEffect.transform.position = snapPosition.position;
+                snapParticleEffect.Play();
+            }
+
+            if (snapSoundEffect != null)
+            {
+                snapSoundEffect.Play();
+            }
+
+            DisableColliders(organ);
+            if (hitboxCollider != null)
+            {
+                hitboxCollider.enabled = false;
             }
         }
     }
@@ -79,11 +113,10 @@ public class HitboxSnap : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        // Vérifier si l’objet est toujours dans la hitbox
         if (organInZone == organ)
         {
-            // Deduct points for the wrong organ
-            scoreManager.AddPoints(-10); // Deduct 10 points
+            scoreManager.AddPoints(-10);
+            ResetOrganToBase(organ);
         }
     }
 
@@ -92,18 +125,47 @@ public class HitboxSnap : MonoBehaviour
         organ.transform.position = snapPosition.position;
         organ.transform.rotation = snapPosition.rotation;
 
-        // Désactiver le mouvement physique
         Rigidbody rb = organ.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.isKinematic = true;
         }
 
-        // Désactiver XRGrabInteractable pour empêcher de le reprendre
-        UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabInteractable = organ.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        var grabInteractable = organ.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
         if (grabInteractable != null)
         {
             grabInteractable.enabled = false;
+        }
+    }
+
+   private void ResetOrganToBase(GameObject organ)
+{
+    if (organBasePositions.ContainsKey(organ) && organBasePositions[organ] != null)
+    {
+        Transform baseTransform = organBasePositions[organ];
+        organ.transform.position = baseTransform.position;
+        organ.transform.rotation = baseTransform.rotation;
+
+        Rigidbody rb = organ.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
+    else
+    {
+        Debug.LogWarning($"Aucune position de base trouvée pour {organ.name}. Vérifie les assignations dans l'Inspector.");
+    }
+}
+
+
+    private void DisableColliders(GameObject organ)
+    {
+        Collider organCollider = organ.GetComponent<Collider>();
+        if (organCollider != null)
+        {
+            organCollider.enabled = false;
         }
     }
 
