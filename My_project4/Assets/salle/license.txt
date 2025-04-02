@@ -1,0 +1,11 @@
+Model Information:
+* title:	Class Room 2021
+* source:	https://sketchfab.com/3d-models/class-room-2021-4e4c12f4c5bd40bb98881eb7102c0b3e
+* author:	CGC Studio (https://sketchfab.com/CGCStudio)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Class Room 2021" (https://sketchfab.com/3d-models/class-room-2021-4e4c12f4c5bd40bb98881eb7102c0b3e) by CGC Studio (https://sketchfab.com/CGCStudio) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

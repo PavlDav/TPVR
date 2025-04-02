@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 3
   tags:
   - Anchor
+  - Liver
+  - Stomach
+  - Pancreas
+  - Intestines
   layers:
   - Default
   - TransparentFX

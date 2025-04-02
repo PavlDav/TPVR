@@ -1,0 +1,11 @@
+Model Information:
+* title:	Spleen Model
+* source:	https://sketchfab.com/3d-models/spleen-model-e4f9d34cb84e44478fb7047445d038d8
+* author:	iqcenter (https://sketchfab.com/iqcenter)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Spleen Model" (https://sketchfab.com/3d-models/spleen-model-e4f9d34cb84e44478fb7047445d038d8) by iqcenter (https://sketchfab.com/iqcenter) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
